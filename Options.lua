@@ -24,20 +24,6 @@ end
 ---------------------------------------------------------------------------
 local RefreshList
 
-StaticPopupDialogs.DANSRICHES_FORGET = {
-    text = "Forget %s?\nThey come back the next time you log in on them.",
-    button1 = YES or "Yes",
-    button2 = NO or "No",
-    OnAccept = function(_, data)
-        ns.Forget(data.realm, data.name)
-        RefreshList()
-    end,
-    timeout = 0,
-    whileDead = true,
-    hideOnEscape = true,
-    preferredIndex = 3,
-}
-
 local function GetHeader(i)
     local header = headers[i]
     if not header then
@@ -81,16 +67,8 @@ local function GetRow(i)
     row.level = row:CreateFontString(nil, "ARTWORK", "GameFontDisableSmall")
     row.level:SetPoint("LEFT", row.name, "RIGHT", 8, 0)
 
-    row.forget = CreateFrame("Button", nil, row, "UIPanelButtonTemplate")
-    row.forget:SetSize(70, 20)
-    row.forget:SetPoint("RIGHT", row, "RIGHT", -4, 0)
-    row.forget:SetText("Forget")
-    row.forget:SetScript("OnClick", function()
-        StaticPopup_Show("DANSRICHES_FORGET", row.charName, nil, { realm = row.realm, name = row.charName })
-    end)
-
     row.money = row:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
-    row.money:SetPoint("RIGHT", row.forget, "LEFT", -12, 0)
+    row.money:SetPoint("RIGHT", row, "RIGHT", -8, 0)
     row.money:SetJustifyH("RIGHT")
 
     rows[i] = row
@@ -124,8 +102,6 @@ RefreshList = function()
             row.name:SetText(ns.NameText(entry.name, entry.char))
             row.level:SetText(entry.char.level and ("Level " .. entry.char.level) or "")
             row.money:SetText(ns.MoneyText(entry.char.money))
-            -- Forgetting the character you're on is pointless: it's saved again right away.
-            row.forget:SetEnabled(not ns.IsCurrentCharacter(realm, entry.name))
             row:Show()
             y = y - ROW_HEIGHT
         end
@@ -201,7 +177,7 @@ ns.OnLogin(function()
     listDesc:SetPoint("RIGHT", panel, "RIGHT", -16, 0)
     listDesc:SetJustifyH("LEFT")
     listDesc:SetTextColor(0.72, 0.72, 0.72)
-    listDesc:SetText("Ticked characters show up in the tooltip. A character is added the first time you log in on them, and their gold is updated every time you play them.")
+    listDesc:SetText("Ticked characters show up in the tooltip. Every character is added here when you log in on them, and their gold is updated while you play them.")
 
     local inset = CreateFrame("Frame", nil, panel, "InsetFrameTemplate")
     inset:SetPoint("TOPLEFT", panel, "TOPLEFT", 16, y - 58)

@@ -10,7 +10,6 @@ See all your gold at a glance: hover your backpack and the tooltip lists your ch
 - **Pick who shows up:** the options page lists every character Dan's Riches knows, grouped by realm. Untick a
   character to keep them out of the tooltip.
 - **Class colors:** names are colored by class. Turn it off for plain white names.
-- **Forget** a deleted or transferred character from the list.
 - Characters are added the first time you log in on them, and their gold is updated every time it changes.
 
 ## Options

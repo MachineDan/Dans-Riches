@@ -195,10 +195,6 @@ function ns.SaveThisCharacter()
     char.faction = UnitFactionGroup("player") or char.faction
 end
 
-function ns.IsCurrentCharacter(realm, name)
-    return realm == ns.RealmKey() and name == ns.PlayerFullName()
-end
-
 -- Characters of one realm, richest first: { { name = ..., char = {...} }, ... }
 function ns.Characters(realm)
     local list = {}
@@ -223,13 +219,6 @@ function ns.Realms()
     table.sort(list)
     if ns.db.realms[current] then table.insert(list, 1, current) end
     return list
-end
-
-function ns.Forget(realm, name)
-    local chars = ns.db.realms[realm]
-    if not chars then return end
-    chars[name] = nil
-    if next(chars) == nil then ns.db.realms[realm] = nil end
 end
 
 -- Try again every second until the gold is known (see ns.ReadMoney).

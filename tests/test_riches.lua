@@ -79,11 +79,6 @@ Expect(visible[1].charName == "Frosty Dan" and visible[1].realm == "Camelot", "t
 Expect(visible[4].realm == "Elsewhere", "other realms after")
 Expect(visible[3].check.checked == false, "hidden character unticked")
 Expect(visible[1].name.text == "|cff3fc7ebFrosty Dan|r", "class colored in the list")
-local myRow
-for _, row in ipairs(visible) do if row.charName == "Healy Dan" then myRow = row end end
-Expect(myRow.forget.enabled == false, "can't forget the character you're on")
-Expect(visible[1].forget.enabled == true, "can forget an alt")
-
 -- Untick a character in the list -> gone from the tooltip
 visible[1].check.checked = false
 visible[1].check.scripts.OnClick(visible[1].check)
@@ -96,11 +91,8 @@ cc.scripts.OnClick(cc)
 Expect(DansRichesDB.classColors == false, "class colors checkbox saves")
 Expect(visible[1].name.text == "Frosty Dan", "list redrawn without class colors")
 
--- Forget an alt
-visible[4].forget.scripts.OnClick(visible[4].forget)
-Expect(T.Popup() and T.Popup().which == "DANSRICHES_FORGET" and T.Popup().data.name == "Far Dan", "forget asks first")
-StaticPopupDialogs.DANSRICHES_FORGET.OnAccept(nil, T.Popup().data)
-Expect(DansRichesDB.realms.Elsewhere == nil, "forgetting the last character drops the realm")
+-- No Forget button: rows only have the show/hide checkbox
+Expect(visible[1].forget == nil, "no Forget button")
 
 -- Defaults
 SlashCmdList.DANSRICHES("reset")
