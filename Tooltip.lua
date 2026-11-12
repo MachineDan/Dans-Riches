@@ -7,7 +7,7 @@ function ns.AddToTooltip(tooltip)
     ns.SaveThisCharacter() -- so the current character's line is always up to date
 
     local rows, total = {}, 0
-    for _, entry in ipairs(ns.Characters(GetRealmName())) do
+    for _, entry in ipairs(ns.Characters(ns.RealmKey())) do
         if entry.char.shown ~= false then
             rows[#rows + 1] = entry
             total = total + (entry.char.money or 0)
@@ -17,7 +17,7 @@ function ns.AddToTooltip(tooltip)
 
     tooltip:AddLine(" ")
     local gold = NORMAL_FONT_COLOR
-    tooltip:AddLine(ns.TITLE, gold and gold.r or 1, gold and gold.g or 0.82, gold and gold.b or 0)
+    tooltip:AddLine("Your Riches", gold and gold.r or 1, gold and gold.g or 0.82, gold and gold.b or 0)
     for _, entry in ipairs(rows) do
         tooltip:AddDoubleLine(ns.NameText(entry.name, entry.char), ns.MoneyText(entry.char.money), 1, 1, 1, 1, 1, 1)
     end

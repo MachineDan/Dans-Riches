@@ -9,6 +9,7 @@
 ## Category-frFR: Inventaire
 ## Category-esES: Inventario
 ## Category-esMX: Inventario
+## OptionalDeps: Syndicator
 ## SavedVariables: DansRichesDB
 
 Core.lua

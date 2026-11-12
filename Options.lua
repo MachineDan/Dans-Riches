@@ -109,7 +109,7 @@ RefreshList = function()
         local header = GetHeader(headerCount)
         header:ClearAllPoints()
         header:SetPoint("TOPLEFT", content, "TOPLEFT", 4, y - 6)
-        header:SetText(realm == GetRealmName() and (realm .. "  |cff888888(this realm)|r") or realm)
+        header:SetText(realm == ns.RealmKey() and (realm .. "  |cff888888(this realm)|r") or realm)
         header:Show()
         y = y - 26
 

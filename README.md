@@ -5,7 +5,7 @@ See all your gold at a glance: hover your backpack and the tooltip lists your ch
 ## Features
 
 - **Gold in the backpack tooltip:** hover the backpack button on your bag bar. Under Blizzard's usual
-  "Backpack" and free-slots lines you get each of your characters on this realm, richest first, with their gold
+  "Backpack" and free-slots lines you get a **Your Riches** section with each of your characters on this realm, richest first, with their gold
   and a **Total** line.
 - **Pick who shows up:** the options page lists every character Dan's Riches knows, grouped by realm. Untick a
   character to keep them out of the tooltip.
@@ -21,5 +21,8 @@ Type **/riches**, or open **Esc → Options → AddOns → Dan's Riches**.
 
 ## Notes
 
-- Only characters you've logged into since installing the addon are known. Log in once on each alt to add them.
+- Characters are known once you log in on them. If **Syndicator** (comes with Baganator) is installed, alts it
+  already knows show up straight away with their last known gold.
+- On WoW Forever, character names are unique per ruleset, so characters are grouped by **PvP** / **PvE** / **RP**
+  instead of the server name, which changes between logins.
 - Made for WoW Forever. No libraries.
