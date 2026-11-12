@@ -1,0 +1,16 @@
+## Interface: 16001
+## Title: Dan's Riches
+## Notes: Hover your backpack to see how much gold each of your characters on this realm has. Pick which characters show up.
+## Author: Daniel
+## Version: 1.0.0
+## IconTexture: Interface\Icons\INV_Misc_Coin_02
+## Category: Inventory
+## Category-deDE: Inventar
+## Category-frFR: Inventaire
+## Category-esES: Inventario
+## Category-esMX: Inventario
+## SavedVariables: DansRichesDB
+
+Core.lua
+Tooltip.lua
+Options.lua
