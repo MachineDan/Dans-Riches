@@ -9,6 +9,8 @@ See all your gold at a glance: hover your backpack and the tooltip lists your ch
   and a **Total** line.
 - **Pick who shows up:** the options page lists every character Dan's Riches knows, grouped by realm. Untick a
   character to keep them out of the tooltip.
+- **Your own order:** characters are richest first by default. Untick **Richest first** and use the up/down
+  arrows in the list to put them in any order you like; the tooltip follows it.
 - **Class colors:** names are colored by class. Turn it off for plain white names.
 - Characters are added the first time you log in on them, and their gold is updated every time it changes.
 
@@ -16,7 +18,7 @@ See all your gold at a glance: hover your backpack and the tooltip lists your ch
 
 Type **/riches**, or open **Esc → Options → AddOns → Dan's Riches**.
 
-- `/riches reset`: class colors and total back on, every character shown again
+- `/riches reset`: class colors, total and richest-first back on, every character shown again
 
 ## Notes
 

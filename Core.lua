@@ -4,11 +4,12 @@
 -- DansRichesDB = {
 --     classColors = true,          -- color names by class in the tooltip
 --     showTotal = true,            -- add a Total line under the characters
+--     sortByGold = true,           -- richest first; false = the player's own order (char.order)
 --     version = 2,
 --     realms = {
 --         ["PvP"] = {                  -- see ns.RealmKey()
 --             ["Healy Dan"] = { money = 123456, class = "PRIEST", level = 60,
---                               faction = "Alliance", shown = true, updated = 1700000000 },
+--                               faction = "Alliance", shown = true, order = 1, updated = 1700000000 },
 --         },
 --     },
 -- }
@@ -18,7 +19,7 @@ local _, ns = ...
 ns.onLogin = {}
 
 ns.TITLE = "Dan's Riches"
-ns.DEFAULTS = { classColors = true, showTotal = true }
+ns.DEFAULTS = { classColors = true, showTotal = true, sortByGold = true }
 
 function ns.Print(msg)
     print("|cffffd100Dan's Riches:|r " .. msg)
@@ -151,7 +152,7 @@ end
 function ns.ResetSettings()
     for key, value in pairs(ns.DEFAULTS) do ns.db[key] = value end
     for _, chars in pairs(ns.db.realms) do
-        for _, char in pairs(chars) do char.shown = true end
+        for _, char in pairs(chars) do char.shown = true; char.order = nil end
     end
 end
 
@@ -195,19 +196,63 @@ function ns.SaveThisCharacter()
     char.faction = UnitFactionGroup("player") or char.faction
 end
 
--- Characters of one realm, richest first: { { name = ..., char = {...} }, ... }
+local function ByGold(a, b)
+    local ma, mb = a.char.money or 0, b.char.money or 0
+    if ma ~= mb then return ma > mb end
+    return a.name < b.name
+end
+
+-- Own order: characters you've placed keep their spot; new ones go to the end,
+-- richest first. Renumbers 1..n so moving a row is a simple swap.
+local function ByOrder(a, b)
+    local oa, ob = a.char.order, b.char.order
+    if oa and ob and oa ~= ob then return oa < ob end
+    if oa and not ob then return true end
+    if ob and not oa then return false end
+    return ByGold(a, b)
+end
+
+-- Characters of one realm, in the chosen order: { { name = ..., char = {...} }, ... }
 function ns.Characters(realm)
     local list = {}
     local chars = ns.db and ns.db.realms[realm]
     if chars then
         for name, char in pairs(chars) do list[#list + 1] = { name = name, char = char } end
     end
-    table.sort(list, function(a, b)
-        local ma, mb = a.char.money or 0, b.char.money or 0
-        if ma ~= mb then return ma > mb end
-        return a.name < b.name
-    end)
+    if ns.db and not ns.db.sortByGold then
+        table.sort(list, ByOrder)
+        for i, entry in ipairs(list) do entry.char.order = i end
+    else
+        table.sort(list, ByGold)
+    end
     return list
+end
+
+-- Moves a character one place up (-1) or down (+1) in the own order.
+function ns.Move(realm, name, delta)
+    local list = ns.Characters(realm)
+    for i, entry in ipairs(list) do
+        if entry.name == name then
+            local other = list[i + delta]
+            if other then
+                entry.char.order, other.char.order = other.char.order, entry.char.order
+            end
+            return
+        end
+    end
+end
+
+-- Switching to the own order starts from what you see now: richest first.
+function ns.SetSortByGold(on)
+    if not on and ns.db.sortByGold then
+        for realm in pairs(ns.db.realms) do
+            local list = ns.Characters(realm) -- gold order, still sortByGold
+            for i, entry in ipairs(list) do
+                if not entry.char.order then entry.char.order = 1000 + i end
+            end
+        end
+    end
+    ns.db.sortByGold = on
 end
 
 -- Realm names, the current one first, then the rest alphabetically.

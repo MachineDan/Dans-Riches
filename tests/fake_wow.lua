@@ -25,6 +25,7 @@ end
 function FrameMethods:RegisterEvent(e) self.events[e] = true end
 function FrameMethods:Show() self.shown = true end
 function FrameMethods:Hide() self.shown = false end
+function FrameMethods:SetShown(on) self.shown = on and true or false end
 function FrameMethods:IsShown() return self.shown end
 function FrameMethods:SetText(t) self.text = t end
 function FrameMethods:GetText() return self.text end

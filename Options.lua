@@ -11,6 +11,9 @@ local SETTINGS = {
       desc = "Color each character's name by class in the tooltip and in the list below." },
     { key = "showTotal", label = "Show total",
       desc = "Add a Total line with all the shown characters' gold together." },
+    { key = "sortByGold", label = "Richest first",
+      desc = "Sort characters by gold. Turn it off to put them in your own order with the arrows in the list below.",
+      set = function(on) ns.SetSortByGold(on) end },
 }
 
 local function PlayClickSound(on)
@@ -67,6 +70,23 @@ local function GetRow(i)
     row.level = row:CreateFontString(nil, "ARTWORK", "GameFontDisableSmall")
     row.level:SetPoint("LEFT", row.name, "RIGHT", 8, 0)
 
+    -- Up/down arrows for the own order (hidden while sorting by gold)
+    row.down = CreateFrame("Button", nil, row, "UIPanelScrollDownButtonTemplate")
+    row.down:SetPoint("RIGHT", row, "RIGHT", -6, 0)
+    row.up = CreateFrame("Button", nil, row, "UIPanelScrollUpButtonTemplate")
+    row.up:SetPoint("RIGHT", row.down, "LEFT", -2, 0)
+    local function Move(delta)
+        ns.Move(row.realm, row.charName, delta)
+        if PlaySound and SOUNDKIT then PlaySound(SOUNDKIT.U_CHAT_SCROLL_BUTTON) end
+        RefreshList()
+    end
+    row.up:SetScript("OnClick", function() Move(-1) end)
+    row.down:SetScript("OnClick", function() Move(1) end)
+    for _, arrow in ipairs({ row.up, row.down }) do
+        arrow:HookScript("OnEnter", function() highlight:Show() end)
+        arrow:HookScript("OnLeave", function() highlight:Hide() end)
+    end
+
     row.money = row:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
     row.money:SetPoint("RIGHT", row, "RIGHT", -8, 0)
     row.money:SetJustifyH("RIGHT")
@@ -91,7 +111,9 @@ RefreshList = function()
         header:Show()
         y = y - 26
 
-        for _, entry in ipairs(ns.Characters(realm)) do
+        local list = ns.Characters(realm)
+        local ownOrder = not ns.db.sortByGold
+        for index, entry in ipairs(list) do
             rowCount = rowCount + 1
             local row = GetRow(rowCount)
             row.realm, row.charName, row.char = realm, entry.name, entry.char
@@ -102,6 +124,16 @@ RefreshList = function()
             row.name:SetText(ns.NameText(entry.name, entry.char))
             row.level:SetText(entry.char.level and ("Level " .. entry.char.level) or "")
             row.money:SetText(ns.MoneyText(entry.char.money))
+            row.up:SetShown(ownOrder)
+            row.down:SetShown(ownOrder)
+            row.up:SetEnabled(index > 1)
+            row.down:SetEnabled(index < #list)
+            row.money:ClearAllPoints()
+            if ownOrder then
+                row.money:SetPoint("RIGHT", row.up, "LEFT", -10, 0)
+            else
+                row.money:SetPoint("RIGHT", row, "RIGHT", -8, 0)
+            end
             row:Show()
             y = y - ROW_HEIGHT
         end
@@ -135,7 +167,7 @@ local function AddCheck(setting, y)
 
     check:SetScript("OnClick", function(self)
         local on = self:GetChecked() and true or false
-        ns.db[setting.key] = on
+        if setting.set then setting.set(on) else ns.db[setting.key] = on end
         PlayClickSound(on)
         RefreshList() -- class colors show in the list too
     end)

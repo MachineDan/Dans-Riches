@@ -94,8 +94,60 @@ Expect(visible[1].name.text == "Frosty Dan", "list redrawn without class colors"
 -- No Forget button: rows only have the show/hide checkbox
 Expect(visible[1].forget == nil, "no Forget button")
 
+-- Own order --------------------------------------------------------------------------------------
+local camelot = DansRichesDB.realms.Camelot
+camelot["Frosty Dan"].shown = true
+local function RowsOf(realm)
+    local out = {}
+    for _, row in ipairs(ns.optionRows) do
+        if row.shown and row.realm == realm then out[#out + 1] = row end
+    end
+    return out
+end
+local function Names(list)
+    local out = {}
+    for _, e in ipairs(list) do out[#out + 1] = e.charName or e.name end
+    return table.concat(out, ",")
+end
+ns.RefreshOptions()
+Expect(RowsOf("Camelot")[1].up.shown == false, "arrows hidden while sorting by gold")
+
+local sort = ns.optionChecks.sortByGold
+Expect(sort.checked == true, "Richest first is on by default")
+sort.checked = false
+sort.scripts.OnClick(sort)
+Expect(DansRichesDB.sortByGold == false, "Richest first off saves")
+local rowsC = RowsOf("Camelot")
+Expect(Names(rowsC) == "Frosty Dan,Healy Dan,Hidden Dan", "own order starts as the gold order (got " .. Names(rowsC) .. ")")
+Expect(rowsC[1].up.shown and rowsC[1].down.shown, "arrows shown in own order")
+Expect(rowsC[1].up.enabled == false and rowsC[3].down.enabled == false, "no moving past the ends")
+
+-- Move Hidden Dan to the top
+rowsC[3].up.scripts.OnClick(rowsC[3].up)
+rowsC = RowsOf("Camelot")
+rowsC[2].up.scripts.OnClick(rowsC[2].up)
+Expect(Names(ns.Characters("Camelot")) == "Hidden Dan,Frosty Dan,Healy Dan", "arrows reorder (got " .. Names(ns.Characters("Camelot")) .. ")")
+
+-- The tooltip follows the own order, even when gold changes
+camelot["Hidden Dan"].shown = true
+player.money = 5000000
+local tl = Hover()
+Expect(tl[5].left:find("Hidden Dan") and tl[6].left:find("Frosty Dan") and tl[7].left:find("Healy Dan"), "tooltip uses own order")
+
+-- A new character goes to the end
+camelot["Newer Dan"] = { money = 99999999, shown = true }
+Expect(Names(ns.Characters("Camelot")) == "Hidden Dan,Frosty Dan,Healy Dan,Newer Dan", "new character added at the end")
+
+-- Back to gold order
+sort.checked = true
+sort.scripts.OnClick(sort)
+Expect(Names(ns.Characters("Camelot")) == "Newer Dan,Healy Dan,Frosty Dan,Hidden Dan", "Richest first sorts by gold again")
+camelot["Newer Dan"] = nil
+player.money = 60000
+
 -- Defaults
 SlashCmdList.DANSRICHES("reset")
 Expect(DansRichesDB.classColors == true and DansRichesDB.realms.Camelot["Frosty Dan"].shown == true, "reset restores defaults and shows everyone")
+Expect(DansRichesDB.sortByGold == true and DansRichesDB.realms.Camelot["Frosty Dan"].order == nil, "reset goes back to richest first")
 
 T.Done()
