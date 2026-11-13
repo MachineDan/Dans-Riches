@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.0.0 (2026-11-13)
 
 First release of **Dan's Riches**: your characters' gold in the backpack tooltip, for WoW Forever.
 
